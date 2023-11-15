@@ -1,0 +1,5 @@
+Sender
+g++ -o sender sender.cpp -lserial -I/usr/include/libserial `pkg-config --cflags --libs opencv4`
+
+Receiver
+g++ -o receiver receiver.cpp -lserial -I/usr/include/libserial `pkg-config --cflags --libs opencv4`
