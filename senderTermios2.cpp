@@ -34,16 +34,27 @@ int initSerialPort(const char* device, int speed) {
         return -1;
     }
 
-    tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
-    tio.c_cflag &= ~CSIZE;              // Clear current char size mask
-    tio.c_cflag |= CS8;                 // 8 data bits
-    tio.c_cflag &= ~PARENB;             // No parity
 
+    // Disable hardware flow control
+    tio.c_cflag &= ~CRTSCTS;
+
+    // Set custom baud rate (for example, 6000000)
     tio.c_cflag &= ~CBAUD;
     tio.c_cflag |= BOTHER;
     tio.c_cflag |= CLOCAL;
     tio.c_ispeed = speed;
     tio.c_ospeed = speed;
+
+    // tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
+    // tio.c_cflag &= ~CSIZE;              // Clear current char size mask
+    // tio.c_cflag |= CS8;                 // 8 data bits
+    // tio.c_cflag &= ~PARENB;             // No parity
+
+    // tio.c_cflag &= ~CBAUD;
+    // tio.c_cflag |= BOTHER;
+    // tio.c_cflag |= CLOCAL;
+    // tio.c_ispeed = speed;
+    // tio.c_ospeed = speed;
 
     if (ioctl(fd, TCSETS2, &tio) == -1) {
         std::cerr << "Error setting terminal attributes: " << std::strerror(errno) << std::endl;

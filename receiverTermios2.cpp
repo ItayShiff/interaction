@@ -32,13 +32,10 @@ int initSerialPort(const char* device, int speed) {
         return -1;
     }
 
+    // Disable hardware flow control
+    tio.c_cflag &= ~CRTSCTS;
 
-    tty.c_cflag |= (CLOCAL | CREAD);    // Enable receiver, local mode
-    tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
-    tio.c_cflag &= ~CSIZE;              // Clear current char size mask
-    tio.c_cflag |= CS8;                 // 8 data bits
-    tio.c_cflag &= ~PARENB;             // No parity
-
+    // Set custom baud rate (for example, 6000000)
     tio.c_cflag &= ~CBAUD;
     tio.c_cflag |= BOTHER;
     tio.c_cflag |= CLOCAL;
