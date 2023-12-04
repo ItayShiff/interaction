@@ -21,7 +21,7 @@ int fd;
 
 // Function to initialize the serial port with custom speed
 int initSerialPort(const char* device, int speed) {
-    int fd = open(device, O_RDWR | O_NOCTTY | O_SYNC);
+    int fd = open(device, O_RDWR | O_NOCTTY);
     if (fd == -1) {
         std::cerr << "Error opening " << device << ": " << std::strerror(errno) << std::endl;
         return -1;
@@ -34,15 +34,28 @@ int initSerialPort(const char* device, int speed) {
         return -1;
     }
 
-    // Disable hardware flow control
-    tio.c_cflag &= ~CRTSCTS;
+    // // Disable hardware flow control
+    // tio.c_cflag &= ~CRTSCTS;
 
-    // Set custom baud rate (for example, 6000000)
+    // // Set custom baud rate (for example, 6000000)
+    // tio.c_cflag &= ~CBAUD;
+    // tio.c_cflag |= BOTHER;
+    // tio.c_cflag |= CLOCAL;
+    // tio.c_ispeed = speed;
+    // tio.c_ospeed = speed;
+
+    // tio.c_cc[VTIME]=0;
+    // tio.c_cc[VMIN]=4;
+
+
+    tio.c_cc[VMIN] = 1;
+    tio.c_cc[VTIME] = 5;
+    tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8;
     tio.c_cflag &= ~CBAUD;
-    tio.c_cflag |= BOTHER;
-    tio.c_cflag |= CLOCAL;
+    tio.c_cflag |= (BOTHER | CREAD | CLOCAL);
     tio.c_ispeed = speed;
     tio.c_ospeed = speed;
+    tio.c_cflag &= ~CRTSCTS;
 
     // tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
     // tio.c_cflag &= ~CSIZE;              // Clear current char size mask
@@ -147,7 +160,7 @@ int main(int argc, char* argv[]) {
     const char* dataToSend = "Hello, Serial Port!";
 
     while (1) {
-        if (sendDataAsString(fd, "Hey From Jetson Nano") == -1) {
+        if (sendDataAsString(fd, "Hey From Jetson NanoHAHAHAHAHAAHHAHAHHFDGSGFHGFDHFDHGDFHDRTHRGFDHCVBCFGBFG") == -1) {
             std::cerr << "Error sending data: " << std::strerror(errno) << std::endl;
         } else {
             std::cout << "Data sent successfully.\n";

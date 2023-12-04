@@ -19,7 +19,7 @@ int fd;
 
 // Function to initialize the serial port with custom speed
 int initSerialPort(const char* device, int speed) {
-    int fd = open(device, O_RDWR | O_NOCTTY | O_SYNC);
+    int fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd == -1) {
         std::cerr << "Error opening " << device << ": " << std::strerror(errno) << std::endl;
         return -1;
@@ -33,23 +33,32 @@ int initSerialPort(const char* device, int speed) {
     }
 
 
-    // Example configuration: 9600 baud, 8 data bits, no parity, 1 stop bit
-    tio.c_cflag |= (CLOCAL | CREAD);    // Enable receiver, local mode
-    tio.c_cflag &= ~CSTOPB;             // 1 stop bit
-    tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
-    tio.c_cflag &= ~CSIZE;              // Clear current char size mask
-    tio.c_cflag |= CS8;                 // 8 data bits
-    tio.c_cflag &= ~PARENB;             // No parity
 
-    // Disable hardware flow control
-    tio.c_cflag &= ~CRTSCTS;
-
-    // Set custom baud rate (for example, 6000000)
+    tio.c_cc[VMIN] = 1;
+    tio.c_cc[VTIME] = 5;
+    tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8;
     tio.c_cflag &= ~CBAUD;
-    tio.c_cflag |= BOTHER;
-    tio.c_cflag |= CLOCAL;
+    tio.c_cflag |= (BOTHER | CREAD | CLOCAL);
     tio.c_ispeed = speed;
     tio.c_ospeed = speed;
+    tio.c_cflag &= ~CRTSCTS;
+    // // Example configuration: 9600 baud, 8 data bits, no parity, 1 stop bit
+    // tio.c_cflag |= (CLOCAL | CREAD);    // Enable receiver, local mode
+    // tio.c_cflag &= ~CSTOPB;             // 1 stop bit
+    // tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
+    // tio.c_cflag &= ~CSIZE;              // Clear current char size mask
+    // tio.c_cflag |= CS8;                 // 8 data bits
+    // tio.c_cflag &= ~PARENB;             // No parity
+
+    // // Disable hardware flow control
+    // tio.c_cflag &= ~CRTSCTS;
+
+    // // Set custom baud rate (for example, 6000000)
+    // tio.c_cflag &= ~CBAUD;
+    // tio.c_cflag |= BOTHER;
+    // tio.c_cflag |= CLOCAL;
+    // tio.c_ispeed = speed;
+    // tio.c_ospeed = speed;
 
     if (ioctl(fd, TCSETS2, &tio) == -1) {
         std::cerr << "Error setting terminal attributes: " << std::strerror(errno) << std::endl;
