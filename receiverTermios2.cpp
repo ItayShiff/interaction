@@ -131,15 +131,30 @@ int main(int argc, char* argv[]) {
     int bytes_count = 0;
 
     std::string receivedData;
+
+
+    // Example: Continuously receiving data and summing total bytes read
+    char buffer[100];
+    ssize_t bytesRead;
+
     auto start_time = std::chrono::high_resolution_clock::now();
-    while (1) {
-            std::string receivedData;
-    if (receiveDataAsString(fd, receivedData, 100) == -1) { // Assuming maximum 100 bytes
-        std::cerr << "Error receiving data: " << std::strerror(errno) << std::endl;
-    } else {
-        std::cout << "Received data: " << receivedData << std::endl;
+    while (bytes_count < 500000)  {
+        bytesRead = receiveData(fd, buffer, sizeof(buffer));
+        if (bytesRead == -1) {
+            std::cerr << "Error receiving data: " << std::strerror(errno) << std::endl;
+            // Decide whether to break the loop or handle the error differently
+            break;
+        } else if (bytesRead > 0) {
+            bytes_count += bytesRead;
+            std::cout << "Received data: " << buffer << std::endl;
+        }
+
+        std::cout << "Total bytes read so far: " << totalBytesRead << std::endl;
+
+        // Optional: Add a small delay or condition to break the loop if necessary
+        // usleep(10000); // Sleep for 10 milliseconds, for example
     }
-    }
+
     // while (bytes_count < 500000) {
     //     cout << "inside" << endl;
     //     if (receiveDataAsString(fd, receivedData, 100) == -1) { // Assuming maximum 100 bytes
