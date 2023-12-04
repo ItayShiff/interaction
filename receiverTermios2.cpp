@@ -42,11 +42,17 @@ int initSerialPort(const char* device, int speed) {
     tio.c_ispeed = speed;
     tio.c_ospeed = speed;
 
+    tio.c_cc[VMIN] = 0;   // Non-blocking read
+    tio.c_cc[VTIME] = 5;  // 0.5 seconds read timeout
+
     if (ioctl(fd, TCSETS2, &tio) == -1) {
         std::cerr << "Error setting terminal attributes: " << std::strerror(errno) << std::endl;
         close(fd);
         return -1;
     }
+
+    // Set the file descriptor to non-blocking mode
+    fcntl(fd, F_SETFL, FNDELAY);
 
     return fd;
 }
@@ -149,7 +155,7 @@ int main(int argc, char* argv[]) {
             std::cout << "Received data: " << buffer << std::endl;
         }
 
-        std::cout << "Total bytes read so far: " << totalBytesRead << std::endl;
+        std::cout << "Total bytes read so far: " << bytes_count << std::endl;
 
         // Optional: Add a small delay or condition to break the loop if necessary
         // usleep(10000); // Sleep for 10 milliseconds, for example
