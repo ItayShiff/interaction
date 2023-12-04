@@ -32,6 +32,15 @@ int initSerialPort(const char* device, int speed) {
         return -1;
     }
 
+
+    // Example configuration: 9600 baud, 8 data bits, no parity, 1 stop bit
+    tio.c_cflag |= (CLOCAL | CREAD);    // Enable receiver, local mode
+    tio.c_cflag &= ~CSTOPB;             // 1 stop bit
+    tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
+    tio.c_cflag &= ~CSIZE;              // Clear current char size mask
+    tio.c_cflag |= CS8;                 // 8 data bits
+    tio.c_cflag &= ~PARENB;             // No parity
+
     // Disable hardware flow control
     tio.c_cflag &= ~CRTSCTS;
 
@@ -42,17 +51,11 @@ int initSerialPort(const char* device, int speed) {
     tio.c_ispeed = speed;
     tio.c_ospeed = speed;
 
-    tio.c_cc[VMIN] = 0;   // Non-blocking read
-    tio.c_cc[VTIME] = 5;  // 0.5 seconds read timeout
-
     if (ioctl(fd, TCSETS2, &tio) == -1) {
         std::cerr << "Error setting terminal attributes: " << std::strerror(errno) << std::endl;
         close(fd);
         return -1;
     }
-
-    // Set the file descriptor to non-blocking mode
-    fcntl(fd, F_SETFL, FNDELAY);
 
     return fd;
 }
@@ -123,6 +126,22 @@ int main(int argc, char* argv[]) {
     cout << fd << endl;
     // Register signal handler
     signal(SIGINT, signalHandler);
+
+    // Continuously read data
+    char buffer[101]; // Extra space for null terminator
+    while (true) {
+        ssize_t bytesRead = read(fd, buffer, sizeof(buffer) - 1);
+        if (bytesRead == -1) {
+            std::cerr << "Error reading from serial port: " << std::strerror(errno) << std::endl;
+            break; // or continue based on error handling
+        } else if (bytesRead > 0) {
+            buffer[bytesRead] = '\0'; // Null-terminate the string
+            std::cout << "Read " << bytesRead << " bytes: " << buffer << std::endl;
+        }
+
+        // Clear the buffer
+        memset(buffer, 0, sizeof(buffer));
+    }
 
     // // Example: Sending data
     // const char* dataToSend = "Hello, Serial Port!";

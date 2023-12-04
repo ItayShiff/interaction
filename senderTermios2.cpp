@@ -34,7 +34,6 @@ int initSerialPort(const char* device, int speed) {
         return -1;
     }
 
-
     // Disable hardware flow control
     tio.c_cflag &= ~CRTSCTS;
 
