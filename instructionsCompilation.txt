@@ -3,3 +3,11 @@ g++ -o sender sender.cpp -lserial -I/usr/include/libserial `pkg-config --cflags 
 
 Receiver
 g++ -o receiver receiver.cpp -lserial -I/usr/include/libserial `pkg-config --cflags --libs opencv4`
+
+
+
+Sender termios2
+g++ -std=c++17 -o sender_termios2 senderTermios2.cpp
+
+Receiver termios
+g++ -std=c++17 -o receiver_termios2 receiverTermios2.cpp

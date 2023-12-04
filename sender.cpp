@@ -6,21 +6,55 @@
 #include <opencv2/videoio.hpp> 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <sstream>
 #include <SerialStream.h>
 
 using namespace LibSerial;
 using namespace cv;
 using namespace std;
 
+// std::string encodeImageToString(const cv::Mat &image) {
+//     vector<uchar> buffer;
+//     cv::imencode(".jpg", image, buffer);
+//     // string encoded = base64_encode()
+//     return base64_encode(buffer.data(), buffer.size());
+// }
+
+// cv::Mat decodeStringToImage(const string &encodedImage) {
+//     string decodedData = base64_decode(encodedImage);
+//     vector<uchar> buffer(decodedData.begin(), decodedData.end());
+//     return cv::imdecode(buffer, cv::IMREAD_UNCHANGED);
+// }
+
 int main() {
     // Mat frame;
     // cv::VideoCapture vid_capture1("./Test1.mp4");   
 
     // Specify the serial port (change this to your port)
-    SerialStream my_serial_stream("/dev/ttyCH343USB0", BaudRate::BAUD_4000000);
+    SerialStream my_serial_stream("/dev/ttyCH343USB0", BaudRate::BAUD_4800);
+
+    // cv::Mat image = cv::imread("./0.jpg");
+
+    // if (image.empty()) {
+    //     cerr << "Error: Could not read the image" << endl;
+    //     return 1;
+    // }
+
+    // string encodedImageString = encodeImageToString(image);
+
+    // cv::Mat reconstructedImage = decodeStringToImage(encodedImageString);
+
+    // cv::imshow("Reconstructed image", reconstructedImage);
+
+
+
+
+    
+
 
     //    std::string input_buffer = "HellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdas";
-    char input_buffer[1000] = "fasHefsafasdfdasHellodsafsasdfsdfafasdfasdfadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdas";
+    // char input_buffer[1000] = "fasHefsafasdfdasHellodsafsasdfsdfafasdfasdfadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdasHellodsafsadfsafasdfdas";
+    char input_buffer[1000] = "Hi_this_is_DroneX_-_Laser_-_Beware\0";
 
 
 
@@ -34,7 +68,8 @@ int main() {
         while (true) {
             // Write the message to the serial port
             // my_serial_stream << message << std::endl;
-            my_serial_stream << input_buffer << std::endl;
+            my_serial_stream << input_buffer << endl;
+            // my_serial_stream.write(input_buffer, 1000);
 
         }
 
