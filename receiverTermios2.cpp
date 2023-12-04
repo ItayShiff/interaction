@@ -19,7 +19,7 @@ int fd;
 
 // Function to initialize the serial port with custom speed
 int initSerialPort(const char* device, int speed) {
-    int fd = open(device, O_RDWR | O_NOCTTY);
+    int fd = open(device, O_RDWR | O_NOCTTY | O_SYNC);
     if (fd == -1) {
         std::cerr << "Error opening " << device << ": " << std::strerror(errno) << std::endl;
         return -1;
@@ -74,7 +74,9 @@ ssize_t sendDataAsString(int fd, const std::string& data) {
 // Function to receive data into a std::string
 ssize_t receiveDataAsString(int fd, std::string& outString, size_t maxBufferSize) {
     char buffer[maxBufferSize];
+    cout << "Before" << endl;
     ssize_t bytesRead = read(fd, buffer, maxBufferSize - 1); // Leave space for null terminator
+    cout << "Bytes read" << bytesRead << endl;
     if (bytesRead > 0) {
         buffer[bytesRead] = '\0'; // Null-terminate the string
         outString = buffer;
@@ -103,12 +105,12 @@ int main(int argc, char* argv[]) {
     // }
 
     // int speed = std::atoi(argv[2]);
-    int speed = 6000000;
-    int fd = initSerialPort("/dev/ttyCH343USB0", speed);
+    int speed = 4800;
+    fd = initSerialPort("/dev/ttyCH343USB0", speed);
     if (fd == -1) {
         return -1;
     }
-
+    cout << fd << endl;
     // Register signal handler
     signal(SIGINT, signalHandler);
 
@@ -122,21 +124,31 @@ int main(int argc, char* argv[]) {
 
     // Example: Receiving data
 
-    int bytes_count;
+    int bytes_count = 0;
 
     std::string receivedData;
     auto start_time = std::chrono::high_resolution_clock::now();
     while (1) {
-        if (receiveDataAsString(fd, receivedData, 100) == -1) { // Assuming maximum 100 bytes
-            std::cerr << "Error receiving data: " << std::strerror(errno) << std::endl;
-        } else {
-            std::cout << "Received data: " << receivedData << std::endl;
-            bytes_count += receivedData.size();
-            // cout << received_data << endl;
-            receivedData = "";
-            
-        }
+            std::string receivedData;
+    if (receiveDataAsString(fd, receivedData, 100) == -1) { // Assuming maximum 100 bytes
+        std::cerr << "Error receiving data: " << std::strerror(errno) << std::endl;
+    } else {
+        std::cout << "Received data: " << receivedData << std::endl;
     }
+    }
+    // while (bytes_count < 500000) {
+    //     cout << "inside" << endl;
+    //     if (receiveDataAsString(fd, receivedData, 100) == -1) { // Assuming maximum 100 bytes
+    //         std::cerr << "Error receiving data: " << std::strerror(errno) << std::endl;
+    //     } else {
+    //         cout << "huh" << endl;
+    //         std::cout << receivedData << std::endl;
+    //         bytes_count += receivedData.size();
+    //         // cout << received_data << endl;
+    //         receivedData = "";
+    //     }
+    //     sleep(1);
+    // }
     auto end_time = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time-start_time);
