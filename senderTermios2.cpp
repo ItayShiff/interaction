@@ -21,7 +21,7 @@ int fd;
 
 // Function to initialize the serial port with custom speed
 int initSerialPort(const char* device, int speed) {
-    int fd = open(device, O_RDWR | O_NOCTTY);
+    int fd = open(device, O_RDWR | O_NOCTTY | O_SYNC);
     if (fd == -1) {
         std::cerr << "Error opening " << device << ": " << std::strerror(errno) << std::endl;
         return -1;
@@ -33,6 +33,11 @@ int initSerialPort(const char* device, int speed) {
         close(fd);
         return -1;
     }
+
+    tio.c_cflag &= ~CRTSCTS;            // No hardware flow control
+    tio.c_cflag &= ~CSIZE;              // Clear current char size mask
+    tio.c_cflag |= CS8;                 // 8 data bits
+    tio.c_cflag &= ~PARENB;             // No parity
 
     tio.c_cflag &= ~CBAUD;
     tio.c_cflag |= BOTHER;
@@ -102,8 +107,7 @@ void signalHandler(int signum) {
 
 int main(int argc, char* argv[]) {
     // int speed = std::atoi(argv[2]);
-    int speed = 10;
-    // int speed = 4800;
+    int speed = 4800;
 
     fd = initSerialPort("/dev/ttyCH343USB0", speed);
     if (fd == -1) {
@@ -114,20 +118,20 @@ int main(int argc, char* argv[]) {
 
     cout << fd << endl;
 
-    unsigned char zero = 0x00;
-    while (true) {
-        int n_written = write(fd, &zero, 1);
+    // unsigned char zero = 0x00;
+    // while (true) {
+    //     int n_written = write(fd, &zero, 1);
 
-        if (n_written < 1) {
-            std::cerr << "Error writing to serial port" << std::endl;
-            break;
-        }
-        else {
-            cout << "Success" << endl;
-        }
+    //     if (n_written < 1) {
+    //         std::cerr << "Error writing to serial port" << std::endl;
+    //         break;
+    //     }
+    //     else {
+    //         cout << "Success" << endl;
+    //     }
 
-        // sleep(2); // Adjust delay as needed
-    }
+    //     // sleep(2); // Adjust delay as needed
+    // }
     
 
     const char* dataToSend = "Hello, Serial Port!";
@@ -138,7 +142,7 @@ int main(int argc, char* argv[]) {
         } else {
             std::cout << "Data sent successfully.\n";
         }
-        sleep(1);
+        // sleep(1);
         // // Example: Sending data
         // if (sendData(fd, dataToSend, strlen(dataToSend)) == -1) {
         //     std::cerr << "Error sending data: " << std::strerror(errno) << std::endl;
